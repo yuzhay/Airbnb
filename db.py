@@ -6,7 +6,7 @@ class Db(object):
 
     def __init__(self, dbname, user, password, host = 'localhost'):
         try:
-            self._conn=psycopg2.connect(f"dbname='{dbname}' user='{user}' password='{password}'")
+            self._conn=psycopg2.connect(dbname=dbname, user=user, password=password, host=host)
             self._conn.autocommit = True
         except:
             print("Can't connect to the database")
@@ -29,6 +29,6 @@ class Db(object):
         try:
             self._cur.executemany(query, params)
         except:
-            print(f"Can't execute many'{query}'")
+            print("Can't execute many'{0}'".format(query))
 
         return self._cur

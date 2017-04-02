@@ -82,7 +82,7 @@ class Api(object):
         month = date.month
         day = date.day
         r = self._session.get(
-            f"{API_URL}/v2/listing_trip_demands/{str(listing_id)}/{year}/{month}/{day}/bysearchdate",
+            API_URL + "/v2/listing_trip_demands/{0}/{1}/{2}/{3}/bysearchdate".format(listing_id, year, month, day),
             params = {
                 'key': 'd306zoyjsyarp7ifhu67rjxn52tv0t20',
                 'currency': str(self._currency)
