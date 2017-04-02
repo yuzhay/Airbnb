@@ -1,0 +1,9 @@
+[database]
+host = localhost
+name = dbname
+user = login
+password = pass
+
+[airbnb]
+login = login_on_airbnb
+pass = pass_on_airbnb
