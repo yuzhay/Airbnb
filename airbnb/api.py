@@ -89,3 +89,13 @@ class Api(object):
             })
         r.raise_for_status()
         return r.json()
+
+    def threads(self, offset = 0, items_per_page = 100):
+        r = self._session.get(API_URL + "/v1/threads",
+            params = {
+                'offset': offset,
+                'items_per_page': items_per_page,
+                'currency': str(self._currency)
+            })
+        r.raise_for_status()
+        return r.json()

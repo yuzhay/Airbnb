@@ -10,6 +10,7 @@ import json
 from models.listing import Listing
 from models.demand import Demand
 from models.user import User
+from models.thread import Thread
 from models.sync_log import SyncLog
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'

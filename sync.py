@@ -32,4 +32,23 @@ for listing in listings:
 
         date_index = add_months(date_index)
 
+
+
+
+thread_index = 0
+while True:
+    response = airbnb.threads(thread_index)
+    total_threads = int(response['thread_count'])
+    threads = response['threads']
+    for t in threads:
+        t = t['thread']
+        if not Thread.exists(db, t['id']):
+            Thread.create(db, t['id'], user['id'], t['status'], t['unread'],
+               t['responded'], t['other_user']['user']['id'],
+               t['other_user']['user']['first_name'], t['preview'], t['updated_at'])
+
+    thread_index += len(threads)
+    if thread_index >= total_threads:
+        break
+
 SyncLog.finish(db)
