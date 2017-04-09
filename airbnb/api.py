@@ -99,3 +99,12 @@ class Api(object):
             })
         r.raise_for_status()
         return r.json()
+
+    def reservation_requests(self, thread_id):
+        r = self._session.get(API_URL + "/v1/reservations/relationship",
+            params = {
+                'thread_id': thread_id,
+                'currency': str(self._currency)
+            })
+        r.raise_for_status()
+        return r.json()
