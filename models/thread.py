@@ -14,3 +14,8 @@ class Thread:
     def exists(db, id):
         result = db.execute("SELECT id FROM threads WHERE id = %s", [id])
         return result.rowcount > 0
+
+    @staticmethod
+    def get_all(db):
+        result = db.execute("SELECT * FROM threads")
+        return result.fetchall()
