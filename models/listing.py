@@ -1,10 +1,10 @@
 class Listing:
 
     @staticmethod
-    def create(db, id, name, user_id):
+    def create(db, **params):
         return db.execute(
             "INSERT INTO listings (id, name, user_id) VALUES (%s, %s, %s);",
-            (id, name, user_id)
+            (params['id'], params['name'], params['user_id'])
         )
 
     @staticmethod
@@ -13,15 +13,15 @@ class Listing:
         return result.rowcount > 0
 
     @staticmethod
-    def update(db, id, name, user_id):
+    def update(db, **params):
         return db.execute(
             "UPDATE listings SET name = %s, user_id = %s WHERE id = %s;",
-            (name, user_id, id)
+            (params['name'], params['user_id'], params['id'])
         )
 
     @staticmethod
-    def update_or_create(db, id, name, user_id):
-        if Listing.exists(db, id):
-            Listing.update(db, id, name, user_id)
+    def update_or_create(db, **params):
+        if Listing.exists(db, params['id']):
+            Listing.update(db, **params)
         else:
-            Listing.create(db, id, name, user_id)
+            Listing.create(db, **params)

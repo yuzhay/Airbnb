@@ -22,13 +22,18 @@ class Sync:
 
     def users(self):
         self._user = airbnb.get_profile()['user']
-        User.update_or_create(self._db, self._user['id'], self._user['first_name'], self._user['last_name'])
+        User.update_or_create(self._db, **self._user)
 
     def listings(self, date_index):
         self._listings = airbnb.listings()['listings']
 
         for listing in self._listings:
-            Listing.update_or_create(self._db, listing['id'], listing['name'], self._user['id'])
+            params = {
+                'id': listing['id'],
+                'name': listing['name'],
+                'user_id': self._user['id']
+            }
+            Listing.update_or_create(self._db, **params)
 
             start_date = datetime.strptime(self._user['created_at'], DATETIME_FORMAT).date()
             now = datetime.now().date()
@@ -38,7 +43,16 @@ class Sync:
                 demands = demands_json['listing_trip_demand']['monthly_trip_demand_counts'][0]['daily_trip_demand_counts']
 
                 for demand in demands:
-                    Demand.update_or_create(self._db, listing['id'], demand['booked'], demand['bookings'], demand['date'], demand['inquiries'], demand['page_views'], demand['unavailable'])
+                    params = {
+                        'listing_id': listing['id'],
+                        'booked': demand['booked'],
+                        'bookings': demand['bookings'],
+                        'date': demand['date'],
+                        'inquiries': demand['inquiries'],
+                        'page_views': demand['page_views'],
+                        'unavailable': demand['unavailable']
+                    }
+                    Demand.update_or_create(self._db, **params)
 
                 date_index = add_months(date_index)
 
@@ -50,10 +64,18 @@ class Sync:
             threads = response['threads']
             for t in threads:
                 t = t['thread']
-                if not Thread.exists(self._db, t['id']):
-                    Thread.create(self._db, t['id'], user['id'], t['status'], t['unread'],
-                       t['responded'], t['other_user']['user']['id'],
-                       t['other_user']['user']['first_name'], t['preview'], t['updated_at'])
+                params = {
+                    'id': t['id'],
+                    'user_id': self._user['id'],
+                    'status': t['status'],
+                    'unread': t['unread'],
+                    'responded': t['responded'],
+                    'other_user_id': t['other_user']['user']['id'],
+                    'other_user_first_name': t['other_user']['user']['first_name'],
+                    'preview': t['preview'],
+                    'updated_at': t['updated_at']
+                }
+                Thread.update_or_create(self._db, **params)
 
             thread_index += len(threads)
             if thread_index >= total_threads:
@@ -72,33 +94,22 @@ class Sync:
              host_user = reservation['host']['user']
              listing = reservation['listing']['listing']
 
-             if ReservationRequest.exists(self._db, reservation['id']):
-                 continue
+             params = {
+                'id': reservation['id'],
+                'thread_id': reservation['thread_id'],
+                'inquiry_checkin_date': thread['inquiry_checkin_date'],
+                'inquiry_checkout_date': thread['inquiry_checkout_date'],
+                'inquiry_number_of_guests': thread['inquiry_number_of_guests'],
+                'inquiry_price_native': thread['inquiry_price_native'],
+                'listing_id': listing['id'],
+                'price': listing['price'],
+                'guest_id': guest['id'],
+                'currency': reservation['native_currency'],
+                'instant_bookable': reservation['instant_bookable'],
+                'is_superhost': host_user['is_superhost'],
+                'identity_verified': guest['identity_verified'],
+                'guest_created_at': guest['created_at'],
+                'status': reservation['status']
+             }
 
-             ReservationRequest.create(self._db,
-                reservation['id'],
-                reservation['thread_id'],
-                thread['inquiry_checkin_date'],
-                thread['inquiry_checkout_date'],
-                thread['inquiry_number_of_guests'],
-                thread['inquiry_price_native'],
-                listing['id'],
-                listing['price'],
-                guest['id'],
-                reservation['native_currency'],
-                reservation['instant_bookable'],
-                host_user['is_superhost'],
-                guest['identity_verified'],
-                guest['created_at'],
-                reservation['status'])
-
-# def f(**params):
-#     print(params)
-#
-# def d(a):
-#     print(a['a'])
-#
-# f(a=1,b=2)
-#
-# a = {'a': 1}
-# f(**a)
+             ReservationRequest.update_or_create(self._db, **params)
