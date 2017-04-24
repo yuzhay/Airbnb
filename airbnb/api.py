@@ -56,13 +56,14 @@ class Api(object):
         r.raise_for_status()
         return r.json()
 
-    def listings(self, limit=10, offset=0):
+    def listings(self, limit=10, offset=0, has_availability=False):
         r = self._session.get(API_URL + "/v2/listings",
             params = {
                 '_limit': limit,
                 '_offset': offset,
                 'currency': str(self._currency),
-                'user_id': str(self.uid)
+                'user_id': str(self.uid),
+                'has_availability': str(has_availability)
             })
         r.raise_for_status()
         return r.json()

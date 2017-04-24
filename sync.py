@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from common import *
+import time
 
 #print(json.dumps(p, indent=2, sort_keys=True))
 
@@ -8,16 +9,32 @@ class Sync:
     _db = None
     _user = None
     _listings = None
+    _timer = None
 
     def __init__(self, db):
         self._db = db
+        self._timer = time.time()
 
-    def run(self):
+    def console(self, msg):
+        print("[{0:f}]\t{1}".format(time.time() - self._timer, msg))
+
+    def run(self, date = date(2016,8,1)):
         SyncLog.start(self._db)
+        self.console("Syncing started")
+
         self.users()
-        self.listings(date(2016,8,1))
+        self.console("Users syncronized")
+
+        self.listings(date)
+        self.console("Listings syncronized")
+
         self.threads()
+        self.console("Threads syncronized")
+
         self.reservation_requests()
+        self.console("ReservationRequests syncronized")
+
+        self.console("Syncing finished")
         SyncLog.finish(self._db)
 
     def users(self):
@@ -26,7 +43,6 @@ class Sync:
 
     def listings(self, date_index):
         self._listings = airbnb.listings()['listings']
-
         for listing in self._listings:
             params = {
                 'id': listing['id'],
@@ -109,7 +125,9 @@ class Sync:
                 'is_superhost': host_user['is_superhost'],
                 'identity_verified': guest['identity_verified'],
                 'guest_created_at': guest['created_at'],
-                'status': reservation['status']
+                'status': reservation['status'],
+                'pending_began_at': reservation['pending_began_at'],
+                'pending_expires_at': reservation['pending_expires_at']
              }
 
              ReservationRequest.update_or_create(self._db, **params)

@@ -7,8 +7,8 @@ class ReservationRequest:
                     "(id, thread_id, inquiry_checkin_date, inquiry_checkout_date,"
                     "inquiry_number_of_guests, inquiry_price_native, listing_id,"
                     "price, guest_id, currency, instant_bookable, is_superhost,"
-                    "identity_verified, guest_created_at, status) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+                    "identity_verified, guest_created_at, status, pending_began_at, pending_expires_at) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
                     )
         return db.execute(
             request,
@@ -18,7 +18,8 @@ class ReservationRequest:
                 params['inquiry_price_native'], params['listing_id'],
                 params['price'], params['guest_id'], params['currency'],
                 params['instant_bookable'], params['is_superhost'],
-                params['identity_verified'], params['guest_created_at'], params['status']
+                params['identity_verified'], params['guest_created_at'], params['status'],
+                params['pending_began_at'], params['pending_expires_at']
             )
         )
 
@@ -29,7 +30,8 @@ class ReservationRequest:
                         "thread_id = %s, inquiry_checkin_date = %s, inquiry_checkout_date = %s,"
                         "inquiry_number_of_guests = %s, inquiry_price_native = %s, listing_id = %s,"
                         "price = %s, guest_id = %s, currency = %s, instant_bookable = %s, is_superhost = %s,"
-                        "identity_verified = %s, guest_created_at = %s, status = %s "
+                        "identity_verified = %s, guest_created_at = %s, status = %s, "
+                        "pending_began_at = %s, pending_expires_at = %s "
                     "WHERE id = %s"
                     )
         return db.execute(
@@ -41,6 +43,7 @@ class ReservationRequest:
                 params['price'], params['guest_id'], params['currency'],
                 params['instant_bookable'], params['is_superhost'],
                 params['identity_verified'], params['guest_created_at'], params['status'],
+                params['pending_began_at'], params['pending_expires_at'],
                 params['id']
             )
         )

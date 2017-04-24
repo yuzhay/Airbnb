@@ -24,6 +24,8 @@ steps = [
             identity_verified           boolean NOT NULL,
             guest_created_at            date NOT NULL,
             status                      varchar(16) NOT NULL,
+            pending_began_at            date NOT NULL,
+            pending_expires_at          date NOT NULL,
 
             updated_at  timestamp without time zone default (now() at time zone 'utc'),
             created_at  timestamp without time zone default (now() at time zone 'utc'),
