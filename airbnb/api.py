@@ -4,6 +4,7 @@ from datetime import datetime, date, time
 
 API_URL = "https://api.airbnb.com"
 CLIENT_ID = "3092nxybyb0otqw18e8nh5nty"
+KEY = "d306zoyjsyarp7ifhu67rjxn52tv0t20"
 
 class AuthError(Exception):
     """
@@ -85,7 +86,7 @@ class Api(object):
         r = self._session.get(
             API_URL + "/v2/listing_trip_demands/{0}/{1}/{2}/{3}/bysearchdate".format(listing_id, year, month, day),
             params = {
-                'key': 'd306zoyjsyarp7ifhu67rjxn52tv0t20',
+                'key': KEY,
                 'currency': str(self._currency)
             })
         r.raise_for_status()
@@ -106,6 +107,55 @@ class Api(object):
             params = {
                 'thread_id': thread_id,
                 'currency': str(self._currency)
+            })
+        r.raise_for_status()
+        return r.json()
+
+    # /v2/hosting_activities
+    #       ?year=2017
+    #       &period=yearly
+    #       &key=d306zoyjsyarp7ifhu67rjxn52tv0t20
+    #       &currency=EUR
+    #       &locale=en
+    # https://www.airbnb.com/api/v2/hosting_activities?year=2016&period=monthly&month=9&key=d306zoyjsyarp7ifhu67rjxn52tv0t20&currency=EUR&locale=en
+
+    def hosting_activities(self, year, period = "yearly"):
+        r = self._session.get(API_URL + "/v2/hosting_activities",
+            params = {
+                'key': KEY,
+                'currency': str(self._currency),
+                'period': period,
+                'year': year
+            })
+        r.raise_for_status()
+        return r.json()
+
+    # /v2/host_earnings
+    #       ?_format=for_web_host_stats
+    #       &year=2017
+    #       &period=yearly
+    #       &key=d306zoyjsyarp7ifhu67rjxn52tv0t20
+    #       &currency=EUR
+    #       &locale=en
+
+    # /v2/host_earnings
+    #       ?_format=for_web_host_stats
+    #       &left_offset=0
+    #       &right_offset=11
+    #       &month=1
+    #       &year=2017
+    #       &key=d306zoyjsyarp7ifhu67rjxn52tv0t20
+    #       &currency=EUR
+    #       &locale=en
+
+    def host_earnings(self, year, period = "yearly")
+        r = self._session.get(API_URL + "/v2/host_earnings",
+            params = {
+                '_format': 'for_web_host_stats',
+                'key': KEY,
+                'currency': str(self._currency),
+                'period': period,
+                'year': year
             })
         r.raise_for_status()
         return r.json()
