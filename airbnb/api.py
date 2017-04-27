@@ -3,6 +3,7 @@ import json
 from datetime import datetime, date, time
 
 API_URL = "https://api.airbnb.com"
+MAIN_URL = "https://airbnb.com"
 CLIENT_ID = "3092nxybyb0otqw18e8nh5nty"
 KEY = "d306zoyjsyarp7ifhu67rjxn52tv0t20"
 
@@ -148,7 +149,7 @@ class Api(object):
     #       &currency=EUR
     #       &locale=en
 
-    def host_earnings(self, year, period = "yearly")
+    def host_earnings(self, year, period = "yearly"):
         r = self._session.get(API_URL + "/v2/host_earnings",
             params = {
                 '_format': 'for_web_host_stats',
@@ -159,3 +160,22 @@ class Api(object):
             })
         r.raise_for_status()
         return r.json()
+
+    # https://www.airbnb.com/transaction_history/45501729
+    #   ?year=2017
+    #   &start_month=1&
+    #   end_month=12
+    #   &for_payout_tracker=true
+    #   &page=1
+
+    # def transaction_history(self):
+    #     r = self._session.get(MAIN_URL + "/transaction_history",
+    #         params = {
+    #             '_format': 'for_web_host_stats',
+    #             'key': KEY,
+    #             'currency': str(self._currency),
+    #             'period': period,
+    #             'year': year
+    #         })
+    #     r.raise_for_status()
+    #     return r.json()
