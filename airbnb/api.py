@@ -120,14 +120,14 @@ class Api(object):
     #       &locale=en
     # https://www.airbnb.com/api/v2/hosting_activities?year=2016&period=monthly&month=9&key=d306zoyjsyarp7ifhu67rjxn52tv0t20&currency=EUR&locale=en
 
-    def hosting_activities(self, year, period = "yearly"):
-        r = self._session.get(API_URL + "/v2/hosting_activities",
-            params = {
-                'key': KEY,
-                'currency': str(self._currency),
-                'period': period,
-                'year': year
-            })
+    def hosting_activities(self, **args):
+        params = {
+            'key': KEY,
+            'currency': str(self._currency)
+        }
+        params.update(args)
+
+        r = self._session.get(API_URL + "/v2/hosting_activities", params = params)
         r.raise_for_status()
         return r.json()
 
@@ -149,15 +149,17 @@ class Api(object):
     #       &currency=EUR
     #       &locale=en
 
-    def host_earnings(self, year, period = "yearly"):
-        r = self._session.get(API_URL + "/v2/host_earnings",
-            params = {
-                '_format': 'for_web_host_stats',
-                'key': KEY,
-                'currency': str(self._currency),
-                'period': period,
-                'year': year
-            })
+    # year, month = None, period = "yearly"
+    def host_earnings(self, **args):
+        params = {
+            '_format': 'for_web_host_stats',
+            'key': KEY,
+            'currency': str(self._currency),
+            'period': 'year',
+            'year': datetime.now().year
+        }
+        params.update(args)
+        r = self._session.get(API_URL + "/v2/host_earnings", params = params)
         r.raise_for_status()
         return r.json()
 

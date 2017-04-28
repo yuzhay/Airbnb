@@ -131,3 +131,31 @@ class Sync:
              }
 
              ReservationRequest.update_or_create(self._db, **params)
+
+    def hosting_activities(self, start_date):
+        date_index = start_date
+        # aprint(dir(date_index))
+        while date_index < datetime.now().date():
+            params = {
+                'year': date_index.year,
+                'month': date_index.month
+            }
+            ha = airbnb.hosting_activities(**params)['hosting_activities'][0]
+            print(json.dumps(ha, indent=2, sort_keys=True))
+            activity = {
+                'year': ha['year'],
+                'month': ha['month'],
+                'nights_booked': ha['nights_booked'],
+                'nights_unbooked': ha['nights_unbooked'],
+                'occupancy_rate': ha['occupancy_rate'],
+                'cleaning_fees': ha['cleaning_fees']['amount']
+            }
+            if ha['nights_price_range'] != None:
+                activity['nights_price_min'] = ha['nights_price_range'][0]['amount'],
+                activity['nights_price_max'] = ha['nights_price_range'][1]['amount']
+            else:
+                activity['nights_price_min'] = None
+                activity['nights_price_max'] = None
+
+            HostingActivity.update_or_create(self._db, **activity)
+            date_index = add_months(date_index)
