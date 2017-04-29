@@ -8,7 +8,7 @@ __depends__ = {'20170410_01_iCTAr-create-reservationrequests'}
 
 steps = [
     step(
-        """ CREATE TABLE host_activities (
+        """ CREATE TABLE hosting_activities (
             year                integer NOT NULL,
             month               integer NOT NULL,
             nights_booked       integer NOT NULL,
@@ -20,6 +20,6 @@ steps = [
 
             UNIQUE (year, month)
         );""",
-        "DROP TABLE host_activities"
+        "DROP TABLE hosting_activities"
     )
 ]

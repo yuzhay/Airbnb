@@ -123,7 +123,8 @@ class Api(object):
     def hosting_activities(self, **args):
         params = {
             'key': KEY,
-            'currency': str(self._currency)
+            'currency': str(self._currency),
+            'period': 'monthly'
         }
         params.update(args)
 
@@ -155,7 +156,7 @@ class Api(object):
             '_format': 'for_web_host_stats',
             'key': KEY,
             'currency': str(self._currency),
-            'period': 'year',
+            'period': 'monthly',
             'year': datetime.now().year
         }
         params.update(args)

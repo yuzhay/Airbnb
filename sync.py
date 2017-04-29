@@ -134,14 +134,14 @@ class Sync:
 
     def hosting_activities(self, start_date):
         date_index = start_date
-        # aprint(dir(date_index))
+
         while date_index < datetime.now().date():
             params = {
                 'year': date_index.year,
                 'month': date_index.month
             }
             ha = airbnb.hosting_activities(**params)['hosting_activities'][0]
-            print(json.dumps(ha, indent=2, sort_keys=True))
+
             activity = {
                 'year': ha['year'],
                 'month': ha['month'],
@@ -158,4 +158,27 @@ class Sync:
                 activity['nights_price_max'] = None
 
             HostingActivity.update_or_create(self._db, **activity)
+            date_index = add_months(date_index)
+
+    def host_earnings(self, start_date):
+        date_index = start_date
+
+        while date_index < datetime.now().date():
+            params = {
+                'year': date_index.year,
+                'month': date_index.month
+            }
+            he = airbnb.host_earnings(**params)['host_earnings'][0]
+
+            earning = {
+                'year': he['year'],
+                'month': he['month'],
+                'cancellation_fees': he['cancellation_fees']['amount'],
+                'cohosting_earnings': he['cohosting_earnings']['amount'],
+                'paid_out': he['paid_out'][0]['amount'],
+                'pending': he['pending'][0]['amount'],
+                'total': he['total'][0]['amount']
+            }
+
+            HostEarning.update_or_create(self._db, **earning)
             date_index = add_months(date_index)

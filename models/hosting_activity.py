@@ -5,7 +5,7 @@ class HostingActivity:
     def create(db, **params):
         return db.execute(
             (
-                "INSERT INTO host_activities "
+                "INSERT INTO hosting_activities "
                     "(year, month, nights_booked,  nights_unbooked, occupancy_rate, "
                     "nights_price_min, nights_price_max, cleaning_fees) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
@@ -20,14 +20,14 @@ class HostingActivity:
 
     @staticmethod
     def exists(db, year, month):
-        result = db.execute("SELECT year, month FROM host_activities WHERE year = %s AND month = %s", [year, month])
+        result = db.execute("SELECT year, month FROM hosting_activities WHERE year = %s AND month = %s", [year, month])
         return result.rowcount > 0
 
     @staticmethod
     def update(db, **params):
         return db.execute(
             (
-                "UPDATE host_activities SET nights_booked=%s,  "
+                "UPDATE hosting_activities SET nights_booked=%s,  "
                 "nights_unbooked=%s, occupancy_rate=%s, nights_price_min=%s, "
                 "nights_price_max=%s, cleaning_fees=%s WHERE year = %s AND month = %s;"
             ),

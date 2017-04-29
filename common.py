@@ -14,6 +14,8 @@ from models.thread import Thread
 from models.reservation_request import ReservationRequest
 from models.hosting_activity import HostingActivity
 from models.model import Model
+from models.user2 import User2
+from models.host_earning import HostEarning
 from models.sync_log import SyncLog
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
