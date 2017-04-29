@@ -3,25 +3,6 @@ class Model:
     PRIMARY_KEY = None
 
     @classmethod
-    def __columns_string(cls, params):
-        return ', '.join('{}'.format(key) for key in params.keys())
-
-    @classmethod
-    def __column_value_string(cls, params):
-        return ', '.join('{0}=%s'.format(key, value) for key, value in params.items())
-
-    @classmethod
-    def __column_value_and_string(cls, params):
-        return ' AND '.join('{0}={1}'.format(key, value) for key, value in params.items())
-
-    @classmethod
-    def __primary_key(cls, params):
-        primary_key = {}
-        for key in cls.PRIMARY_KEY:
-            primary_key[key] = params[key]
-        return primary_key
-
-    @classmethod
     def create(cls, db, **params):
         columns = cls.__columns_string(params)
         values = ', '.join('{}'.format('%s') for value in params.values())
@@ -59,6 +40,29 @@ class Model:
             cls.create(db, **params)
 
     @classmethod
+    def get(cls, db, **params):
+        return cls.__select(db, **params).fetchone()
+
+    @classmethod
+    def __columns_string(cls, params):
+        return ', '.join('{}'.format(key) for key in params.keys())
+
+    @classmethod
+    def __column_value_string(cls, params):
+        return ', '.join('{0}=%s'.format(key, value) for key, value in params.items())
+
+    @classmethod
+    def __column_value_and_string(cls, params):
+        return ' AND '.join('{0}={1}'.format(key, value) for key, value in params.items())
+
+    @classmethod
+    def __primary_key(cls, params):
+        primary_key = {}
+        for key in cls.PRIMARY_KEY:
+            primary_key[key] = params[key]
+        return primary_key
+
+    @classmethod
     def __select(cls, db, **params):
         query = "SELECT * FROM {0} WHERE {1};"
         primary_key = cls.__primary_key(params)
@@ -67,7 +71,3 @@ class Model:
 
         result = db.execute(query, list(params.values()))
         return result
-
-    @classmethod
-    def get(cls, db, **params):
-        return cls.__select(db, **params).fetchone()

@@ -34,6 +34,12 @@ class Sync:
         self.reservation_requests()
         self.console("ReservationRequests syncronized")
 
+        self.hosting_activities(date)
+        self.console("HostingActivities syncronized")
+
+        self.host_earnings(date)
+        self.console("HostEarnings syncronized")
+
         self.console("Syncing finished")
         SyncLog.finish(self._db)
 

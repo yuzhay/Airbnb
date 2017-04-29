@@ -4,6 +4,7 @@ from common import *
 from sync import Sync
 
 sync = Sync(db)
+sync.run(date(2016,8,1))
 #
 sync.hosting_activities(date(2016,8,1))
 sync.host_earnings(date(2016,8,1))

@@ -18,6 +18,9 @@ steps = [
             nights_price_max    integer NULL,
             cleaning_fees       integer NOT NULL,
 
+            updated_at  timestamp without time zone default (now() at time zone 'utc'),
+            created_at  timestamp without time zone default (now() at time zone 'utc'),
+            
             UNIQUE (year, month)
         );""",
         "DROP TABLE hosting_activities"
