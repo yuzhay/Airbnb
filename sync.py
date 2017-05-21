@@ -44,11 +44,11 @@ class Sync:
         SyncLog.finish(self._db)
 
     def users(self):
-        self._user = airbnb.get_profile()['user']
+        self._user = AIRBNB.get_profile()['user']
         User.update_or_create(self._db, **self._user)
 
     def listings(self, date_index):
-        self._listings = airbnb.listings()['listings']
+        self._listings = AIRBNB.listings()['listings']
         for listing in self._listings:
             params = {
                 'id': listing['id'],
@@ -61,7 +61,7 @@ class Sync:
             now = datetime.now().date()
 
             while (date_index < now):
-                demands_json = airbnb.listing_trip_demands(listing['id'], date_index)
+                demands_json = AIRBNB.listing_trip_demands(listing['id'], date_index)
                 demands = demands_json['listing_trip_demand']['monthly_trip_demand_counts'][0]['daily_trip_demand_counts']
 
                 for demand in demands:
@@ -81,7 +81,7 @@ class Sync:
     def threads(self):
         thread_index = 0
         while True:
-            response = airbnb.threads(thread_index)
+            response = AIRBNB.threads(thread_index)
             total_threads = int(response['thread_count'])
             threads = response['threads']
             for t in threads:
@@ -106,7 +106,7 @@ class Sync:
     def reservation_requests(self):
         self._threads = Thread.get_all(self._db)
         for thread in self._threads:
-             response = airbnb.reservation_requests(thread[0])
+             response = AIRBNB.reservation_requests(thread[0])
              if response['reservation'] is None:
                  continue
 
@@ -146,7 +146,7 @@ class Sync:
                 'year': date_index.year,
                 'month': date_index.month
             }
-            ha = airbnb.hosting_activities(**params)['hosting_activities'][0]
+            ha = AIRBNB.hosting_activities(**params)['hosting_activities'][0]
 
             activity = {
                 'year': ha['year'],
@@ -174,7 +174,7 @@ class Sync:
                 'year': date_index.year,
                 'month': date_index.month
             }
-            he = airbnb.host_earnings(**params)['host_earnings'][0]
+            he = AIRBNB.host_earnings(**params)['host_earnings'][0]
 
             earning = {
                 'year': he['year'],

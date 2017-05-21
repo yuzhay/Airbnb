@@ -2,12 +2,17 @@
 
 from common import *
 from sync import Sync
+from competitors import Competitors
 
-sync = Sync(db)
+sync = Sync(DB)
 sync.run(date(2016,8,1))
-#
-sync.hosting_activities(date(2016,8,1))
-sync.host_earnings(date(2016,8,1))
+# #
+# sync.hosting_activities(date(2016,8,1))
+# sync.host_earnings(date(2016,8,1))
+
+competitors = Competitors(DB, COMPETITORS)
+competitors.run()
+
 
 # b = User2.update_or_create(db, **{'id': '10', 'first_name': 'YYYY', 'last_name': 'ZZZZ'})
 # print(b)

@@ -7,8 +7,7 @@ class Model:
         columns = cls.__columns_string(params)
         values = ', '.join('{}'.format('%s') for value in params.values())
         query = "INSERT INTO {0} ({1}) VALUES({2});".format(cls.TABLE_NAME, columns, values)
-        print(list(params.values()))
-        return db.execute(query,list(params.values()))
+        return db.execute(query, list(params.values()))
 
     @classmethod
     def exists(cls, db, **params):
@@ -49,11 +48,11 @@ class Model:
 
     @classmethod
     def __column_value_string(cls, params):
-        return ', '.join('{0}=%s'.format(key, value) for key, value in params.items())
+        return ', '.join("{0}=%s".format(key, value) for key, value in params.items())
 
     @classmethod
     def __column_value_and_string(cls, params):
-        return ' AND '.join('{0}={1}'.format(key, value) for key, value in params.items())
+        return ' AND '.join("{0}='{1}'".format(key, value) for key, value in params.items())
 
     @classmethod
     def __primary_key(cls, params):
