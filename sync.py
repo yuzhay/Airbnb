@@ -141,7 +141,7 @@ class Sync:
     def hosting_activities(self, start_date):
         date_index = start_date
 
-        while date_index < datetime.now().date():
+        while date_index < add_months(datetime.now(), 3):
             params = {
                 'year': date_index.year,
                 'month': date_index.month
