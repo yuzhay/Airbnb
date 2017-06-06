@@ -1,23 +1,21 @@
-from datetime import date
 import configparser
 import json
+import os
+from datetime import date, datetime, time, timedelta
+
+import requests
 from airbnb import Api
 from db import Db
-from datetime import datetime, date, time, timedelta
-import os
-import requests
-
-from models.listing import Listing
-from models.demand import Demand
-from models.user import User
-from models.thread import Thread
-from models.reservation_request import ReservationRequest
-from models.hosting_activity import HostingActivity
-from models.model import Model
 from models.competitor import Competitor
-from models.user2 import User2
+from models.demand import Demand
 from models.host_earning import HostEarning
+from models.hosting_activity import HostingActivity
+from models.listing import Listing
+from models.model import Model
+from models.reservation_request import ReservationRequest
 from models.sync_log import SyncLog
+from models.thread import Thread
+from models.user import User
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 

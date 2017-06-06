@@ -18,4 +18,4 @@ class Competitors(object):
                 'currency': listing['listing_native_currency'],
                 'data': json.dumps(listing)
             }
-            Competitor.update_or_create(self._db, **params)
+            Competitor.update_or_create(self._db, params)

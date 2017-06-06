@@ -6,19 +6,24 @@ import time
 #print(json.dumps(p, indent=2, sort_keys=True))
 
 class Sync:
+    """Full synchronizer"""
+
     _db = None
     _user = None
     _listings = None
     _timer = None
 
     def __init__(self, db):
+        """Constructor"""
         self._db = db
         self._timer = time.time()
 
     def console(self, msg):
-        print("[{0:f}]\t{1}".format(time.time() - self._timer, msg))
+        """Print console"""
+        print("[{0:0.2f}]\t{1}".format(time.time() - self._timer, msg))
 
-    def run(self, date = date(2016,8,1)):
+    def run(self, date=date(2016, 8, 1)):
+        """Run synchronization"""
         SyncLog.start(self._db)
         self.console("Syncing started")
 
@@ -44,10 +49,13 @@ class Sync:
         SyncLog.finish(self._db)
 
     def users(self):
+        """Sync users"""
         self._user = AIRBNB.get_profile()['user']
-        User.update_or_create(self._db, **self._user)
+        params = {key: self._user[key] for key in ['id', 'first_name', 'last_name']}
+        User.update_or_create(self._db, params)
 
     def listings(self, date_index):
+        """Sync listings"""
         self._listings = AIRBNB.listings()['listings']
         for listing in self._listings:
             params = {
@@ -55,9 +63,9 @@ class Sync:
                 'name': listing['name'],
                 'user_id': self._user['id']
             }
-            Listing.update_or_create(self._db, **params)
+            Listing.update_or_create(self._db, params)
 
-            start_date = datetime.strptime(self._user['created_at'], DATETIME_FORMAT).date()
+            # start_date = datetime.strptime(self._user['created_at'], DATETIME_FORMAT).date()
             now = datetime.now().date()
 
             while (date_index < now):
@@ -74,11 +82,12 @@ class Sync:
                         'page_views': demand['page_views'],
                         'unavailable': demand['unavailable']
                     }
-                    Demand.update_or_create(self._db, **params)
+                    Demand.update_or_create(self._db, params)
 
                 date_index = add_months(date_index)
 
     def threads(self):
+        """Sync Threads"""
         thread_index = 0
         while True:
             response = AIRBNB.threads(thread_index)
@@ -97,26 +106,27 @@ class Sync:
                     'preview': t['preview'],
                     'updated_at': t['updated_at']
                 }
-                Thread.update_or_create(self._db, **params)
+                Thread.update_or_create(self._db, params)
 
             thread_index += len(threads)
             if thread_index >= total_threads:
                 break
 
     def reservation_requests(self):
+        """Sync Reservation Requests"""
         self._threads = Thread.get_all(self._db)
         for thread in self._threads:
-             response = AIRBNB.reservation_requests(thread[0])
-             if response['reservation'] is None:
-                 continue
+            response = AIRBNB.reservation_requests(thread[0])
+            if response['reservation'] is None:
+                continue
 
-             reservation = response['reservation']['reservation']
-             thread = response['thread']['thread']
-             guest = reservation['guest']['user']
-             host_user = reservation['host']['user']
-             listing = reservation['listing']['listing']
+            reservation = response['reservation']['reservation']
+            thread = response['thread']['thread']
+            guest = reservation['guest']['user']
+            host_user = reservation['host']['user']
+            listing = reservation['listing']['listing']
 
-             params = {
+            params = {
                 'id': reservation['id'],
                 'thread_id': reservation['thread_id'],
                 'inquiry_checkin_date': thread['inquiry_checkin_date'],
@@ -134,11 +144,12 @@ class Sync:
                 'status': reservation['status'],
                 'pending_began_at': reservation['pending_began_at'],
                 'pending_expires_at': reservation['pending_expires_at']
-             }
+            }
 
-             ReservationRequest.update_or_create(self._db, **params)
+            ReservationRequest.update_or_create(self._db, params)
 
     def hosting_activities(self, start_date):
+        """Sync HostingActivities"""
         date_index = start_date
 
         while date_index < add_months(datetime.now(), 3):
@@ -163,10 +174,11 @@ class Sync:
                 activity['nights_price_min'] = None
                 activity['nights_price_max'] = None
 
-            HostingActivity.update_or_create(self._db, **activity)
+            HostingActivity.update_or_create(self._db, activity)
             date_index = add_months(date_index)
 
     def host_earnings(self, start_date):
+        """Sync HostEarnings"""
         date_index = start_date
 
         while date_index < add_months(datetime.now(), 3):
@@ -186,5 +198,5 @@ class Sync:
                 'total': he['total'][0]['amount']
             }
 
-            HostEarning.update_or_create(self._db, **earning)
+            HostEarning.update_or_create(self._db, earning)
             date_index = add_months(date_index)

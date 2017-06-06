@@ -1,16 +1,18 @@
+import json
+
 class Model:
     TABLE_NAME = None
     PRIMARY_KEY = None
 
     @classmethod
-    def create(cls, db, **params):
+    def create(cls, db, params):
         columns = cls.__columns_string(params)
         values = ', '.join('{}'.format('%s') for value in params.values())
         query = "INSERT INTO {0} ({1}) VALUES({2});".format(cls.TABLE_NAME, columns, values)
         return db.execute(query, list(params.values()))
 
     @classmethod
-    def exists(cls, db, **params):
+    def exists(cls, db, params):
         primary_key = cls.__primary_key(params)
         primary_key_cause = cls.__column_value_and_string(primary_key)
 
@@ -19,7 +21,7 @@ class Model:
         return result.rowcount > 0
 
     @classmethod
-    def update(cls, db, **params):
+    def update(cls, db, params):
         query = "UPDATE {0} SET {1} WHERE {2};"
         primary_key = cls.__primary_key(params)
         primary_key_cause = cls.__column_value_and_string(primary_key)
@@ -32,15 +34,21 @@ class Model:
         return db.execute(query, list(params.values()))
 
     @classmethod
-    def update_or_create(cls, db, **params):
-        if cls.exists(db, **params):
-            cls.update(db, **params)
+    def update_or_create(cls, db, params):
+        if cls.exists(db, params):
+            cls.update(db, params)
         else:
-            cls.create(db, **params)
+            cls.create(db, params)
 
     @classmethod
-    def get(cls, db, **params):
-        return cls.__select(db, **params).fetchone()
+    def get(cls, db, params):
+        return cls.__select(db, params).fetchone()
+
+    @classmethod
+    def get_all(cls, db):
+        query = "SELECT * FROM {0};".format(cls.TABLE_NAME)
+        result = db.execute(query)
+        return result.fetchall()
 
     @classmethod
     def __columns_string(cls, params):
@@ -62,7 +70,7 @@ class Model:
         return primary_key
 
     @classmethod
-    def __select(cls, db, **params):
+    def __select(cls, db, params):
         query = "SELECT * FROM {0} WHERE {1};"
         primary_key = cls.__primary_key(params)
         primary_key_cause = cls.__column_value_and_string(primary_key)
