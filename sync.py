@@ -3,8 +3,6 @@
 from common import *
 import time
 
-#print(json.dumps(p, indent=2, sort_keys=True))
-
 class Sync:
     """Full synchronizer"""
 
@@ -21,6 +19,9 @@ class Sync:
     def console(self, msg):
         """Print console"""
         print("[{0:0.2f}]\t{1}".format(time.time() - self._timer, msg))
+
+    def json_print(self, param):
+        print(json.dumps(param, indent=2, sort_keys=True))
 
     def run(self, date=date(2016, 8, 1)):
         """Run synchronization"""
@@ -54,7 +55,7 @@ class Sync:
         params = {key: self._user[key] for key in ['id', 'first_name', 'last_name']}
         User.update_or_create(self._db, params)
 
-    def listings(self, date_index):
+    def listings(self, start_date):
         """Sync listings"""
         self._listings = AIRBNB.listings()['listings']
         for listing in self._listings:
@@ -67,6 +68,7 @@ class Sync:
 
             # start_date = datetime.strptime(self._user['created_at'], DATETIME_FORMAT).date()
             now = datetime.now().date()
+            date_index = start_date
 
             while (date_index < now):
                 demands_json = AIRBNB.listing_trip_demands(listing['id'], date_index)

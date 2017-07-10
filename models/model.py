@@ -1,5 +1,6 @@
 import json
 
+
 class Model:
     TABLE_NAME = None
     PRIMARY_KEY = None
@@ -8,7 +9,8 @@ class Model:
     def create(cls, db, params):
         columns = cls.__columns_string(params)
         values = ', '.join('{}'.format('%s') for value in params.values())
-        query = "INSERT INTO {0} ({1}) VALUES({2});".format(cls.TABLE_NAME, columns, values)
+        query = "INSERT INTO {0} ({1}) VALUES({2});".format(
+            cls.TABLE_NAME, columns, values)
         return db.execute(query, list(params.values()))
 
     @classmethod
@@ -16,7 +18,8 @@ class Model:
         primary_key = cls.__primary_key(params)
         primary_key_cause = cls.__column_value_and_string(primary_key)
 
-        query = "SELECT * FROM {0} WHERE {1}".format(cls.TABLE_NAME, primary_key_cause)
+        query = "SELECT * FROM {0} WHERE {1}".format(
+            cls.TABLE_NAME, primary_key_cause)
         result = db.execute(query, list(params.values()))
         return result.rowcount > 0
 

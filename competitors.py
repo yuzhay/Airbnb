@@ -1,5 +1,6 @@
 from common import *
 
+
 class Competitors(object):
     """Competitors synchronizer"""
 
