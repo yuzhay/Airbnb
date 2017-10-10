@@ -85,12 +85,15 @@ class Api(object):
         month = date.month
         day = date.day
         r = self._session.get(
-            API_URL + "/v2/listing_trip_demands/{0}/{1}/{2}/{3}/bysearchdate".format(listing_id, year, month, day),
+            MAIN_URL + "/api/v2/listing_trip_demands/{0}/{1}/{2}/{3}/bysearchdate".format(listing_id, year, month, day),
             params = {
                 'key': KEY,
                 'currency': str(self._currency)
             })
-        r.raise_for_status()
+        #r.raise_for_status()
+        if r.status_code != 200:
+          return None
+
         return r.json()
 
     def threads(self, offset = 0, items_per_page = 100):
