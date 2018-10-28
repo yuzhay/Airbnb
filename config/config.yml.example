@@ -1,0 +1,21 @@
+database:
+  host:
+  name:
+  user:
+  password:
+
+airbnb:
+  key:            d306zoyjsyarp7ifhu67rjxn52tv0t20
+  api_key:        915pw2pnf4h1aiguhph5gc5b2
+  currency:       EUR
+  user:
+    login:
+    pass:
+  listings:
+    - id:         12345
+      start_date: 01.10.2018
+      kind:       room
+    - id:         12346
+      start_date: 01.09.2018
+      kind:       room
+  competitors: [1,2,3,4]

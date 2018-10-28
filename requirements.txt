@@ -1,5 +1,4 @@
-# pip3 install -r requirements.txt
-
 yoyo-migrations==5.0.5
-psycopg2-binary
 requests
+pylint
+pyyaml

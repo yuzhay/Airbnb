@@ -12,15 +12,15 @@ steps = [
             year                integer NOT NULL,
             month               integer NOT NULL,
             nights_booked       integer NOT NULL,
-            nights_unbooked     integer NOT NULL,
-            occupancy_rate      integer NOT NULL,
+            nights_unbooked     integer,
+            occupancy_rate      integer,
             nights_price_min    integer NULL,
             nights_price_max    integer NULL,
             cleaning_fees       integer NOT NULL,
 
             updated_at  timestamp without time zone default (now() at time zone 'utc'),
             created_at  timestamp without time zone default (now() at time zone 'utc'),
-            
+
             UNIQUE (year, month)
         );""",
         "DROP TABLE hosting_activities"

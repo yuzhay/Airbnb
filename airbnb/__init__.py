@@ -1,3 +1,3 @@
-#!/usr/bin/env python3
-
 from airbnb.api import Api
+from airbnb.exceptions import *
+from airbnb.helpers import *

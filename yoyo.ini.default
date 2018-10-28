@@ -1,7 +1,0 @@
-[DEFAULT]
-
-# Target database
-database = postgresql://login:pass@localhost/dbname
-
-# Verbosity level. Goes from 0 (least verbose) to 3 (most verbose)
-verbosity = 1
