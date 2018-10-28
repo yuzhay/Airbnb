@@ -1,6 +1,7 @@
 import requests
 import json
 from datetime import datetime, date, time
+import pprint
 
 API_URL = "https://api.airbnb.com"
 MAIN_URL = "https://airbnb.com"
@@ -36,6 +37,7 @@ class Api(object):
             }
             r = self._session.post(
                 API_URL + "/v1/authorize",
+                # MAIN_URL + "/authenticate",
                 params = {
                     'client_id': CLIENT_ID,
                     'currency': currency
@@ -85,12 +87,14 @@ class Api(object):
         month = date.month
         day = date.day
         r = self._session.get(
-            MAIN_URL + "/api/v2/listing_trip_demands/{0}/{1}/{2}/{3}/bysearchdate".format(listing_id, year, month, day),
+            MAIN_URL + "/api/v1/listing_trip_demands/{0}/{1}/{2}/{3}/bysearchdate".format(listing_id, year, month, day),
             params = {
                 'key': KEY,
                 'currency': str(self._currency)
             })
-        #r.raise_for_status()
+        pprint.pprint(r.content)
+        r.raise_for_status()
+
         if r.status_code != 200:
           return None
 
