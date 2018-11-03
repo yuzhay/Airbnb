@@ -1,16 +1,16 @@
 database:
-  host:
-  name:
-  user:
-  password:
+  host:           localhost
+  name:           mydb
+  user:           postgres
+  password:       pass
 
 airbnb:
   key:            d306zoyjsyarp7ifhu67rjxn52tv0t20
   api_key:        915pw2pnf4h1aiguhph5gc5b2
   currency:       EUR
   user:
-    login:
-    pass:
+    login:        user@site.com
+    pass:         password
   listings:
     - id:         12345
       start_date: 01.10.2018

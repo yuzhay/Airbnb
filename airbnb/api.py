@@ -127,14 +127,6 @@ class Api(object):
     r.raise_for_status()
     return r.json()
 
-    # /v2/hosting_activities
-    #       ?year=2017
-    #       &period=yearly
-    #       &key=d306zoyjsyarp7ifhu67rjxn52tv0t20
-    #       &currency=EUR
-    #       &locale=en
-    # https://www.airbnb.com/api/v2/hosting_activities?year=2016&period=monthly&month=9&key=d306zoyjsyarp7ifhu67rjxn52tv0t20&currency=EUR&locale=en
-
   def hosting_activities(self, **args):
     assert(self._access_token)
     params = {
@@ -148,25 +140,7 @@ class Api(object):
     r.raise_for_status()
     return r.json()
 
-    # /v2/host_earnings
-    #       ?_format=for_web_host_stats
-    #       &year=2017
-    #       &period=yearly
-    #       &key=d306zoyjsyarp7ifhu67rjxn52tv0t20
-    #       &currency=EUR
-    #       &locale=en
 
-    # /v2/host_earnings
-    #       ?_format=for_web_host_stats
-    #       &left_offset=0
-    #       &right_offset=11
-    #       &month=1
-    #       &year=2017
-    #       &key=d306zoyjsyarp7ifhu67rjxn52tv0t20
-    #       &currency=EUR
-    #       &locale=en
-
-    # year, month = None, period = "yearly"
   def host_earnings(self, **args):
     assert(self._access_token)
     params = {
@@ -180,22 +154,3 @@ class Api(object):
     r = self._session.get(API_URL + "/host_earnings", params = params)
     r.raise_for_status()
     return r.json()
-
-    # https://www.airbnb.com/transaction_history/45501729
-    #   ?year=2017
-    #   &start_month=1&
-    #   end_month=12
-    #   &for_payout_tracker=true
-    #   &page=1
-
-    # def transaction_history(self):
-    #     r = self._session.get(MAIN_URL + "/transaction_history",
-    #         params = {
-    #             '_format': 'for_web_host_stats',
-    #             'key': KEY,
-    #             'currency': str(self._currency),
-    #             'period': period,
-    #             'year': year
-    #         })
-    #     r.raise_for_status()
-    #     return r.json()

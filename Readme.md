@@ -1,5 +1,6 @@
-pip3 install -r requirements.txt
+# Installation
+`pip3 install -r requirements.txt`
 
-CREATE DATABASE airbnb;
+`CREATE DATABASE airbnb;`
 
-yoyo apply ./db/migrations
+`./app.py migrate`
