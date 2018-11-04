@@ -6,17 +6,18 @@ from models import *
 from airbnb import add_months
 
 class Sync:
-  """Full synchronizer"""
+  """Full synchronizer
+  """
 
   DATE_FORMAT = '%Y-%m-%d'
   DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
   STEPS = [
     'users',
-    'listings',
-    'threads',
-    'reservation_requests',
-    'hosting_activities',
-    'host_earnings',
+    # 'listings',
+    # 'threads',
+    'reservations',
+    # 'hosting_activities',
+    # 'host_earnings',
   ]
 
   _db = None
@@ -26,7 +27,9 @@ class Sync:
 
 
   def __init__(self, db, airbnb, sync_listings = {}):
-    """Constructor"""
+    """Constructor
+    """
+
     self._db = db
     self._airbnb = airbnb
     self._timer = time.time()
@@ -34,7 +37,9 @@ class Sync:
 
 
   def console(self, msg):
-    """Print console"""
+    """Print console
+    """
+
     print("[{0:0.2f}]\t{1}".format(time.time() - self._timer, msg))
 
 
@@ -43,7 +48,9 @@ class Sync:
 
 
   def run(self):
-    """Run synchronization"""
+    """Run synchronization
+    """
+
     SyncLog.start(self._db)
     self.console("Syncing started")
 
@@ -56,7 +63,9 @@ class Sync:
 
 
   def users(self):
-    """Sync users"""
+    """Sync users
+    """
+
     self._user = self._airbnb.get_profile()['login']['account']['user']
     params = {key: self._user[key] for key in ['id', 'first_name', 'last_name', 'created_at']}
     params['registered_at'] = params.pop('created_at')
@@ -64,7 +73,8 @@ class Sync:
 
 
   def listings(self):
-    """Sync listings"""
+    """Sync listings
+    """
 
     listings = self._airbnb.listings()['listings']
     self._listings = list(filter(lambda listing : listing['id'] in self._sync_listings, listings))
@@ -102,7 +112,8 @@ class Sync:
 
 
   def threads(self):
-    """Sync Threads"""
+    """Sync Threads
+    """
 
     total_pages = 0
     offset = 0
@@ -113,13 +124,20 @@ class Sync:
       threads = response['threads']
 
       for t in threads:
+        other_user = t['other_user']
+        guest = {
+          'id': other_user['id'],
+          'first_name': other_user['first_name']
+        }
+
+        Guest.update_or_create(self._db, guest)
+
         params = {
           'id': t['id'],
           'user_id': self._user['id'],
           'status': t['status'],
           'unread': t['unread'],
           'other_user_id': t['other_user']['id'],
-          'other_user_first_name': t['other_user']['first_name'],
         }
         Thread.update_or_create(self._db, params)
 
@@ -128,46 +146,43 @@ class Sync:
       if page >= total_pages:
         break
 
-  def reservation_requests(self):
-    """Sync Reservation Requests"""
+  def reservations(self):
+    """Sync Reservations
+    """
 
-    self._threads = Thread.get_all(self._db)
-    for thread in self._threads:
-      response = self._airbnb.reservation_requests(thread[0])
-      if response['reservation'] is None:
-          continue
+    offset = 0
+    while True:
+      response = self._airbnb.reservations(offset)
+      total_count = response['metadata']['total_count']
+      reservations = response['reservations']
 
-      reservation = response['reservation']['reservation']
-      thread = response['thread']['thread']
-      guest = reservation['guest']['user']
-      host_user = reservation['host']['user']
-      listing = reservation['listing']['listing']
-
-      params = {
-        'id': reservation['id'],
-        'thread_id': reservation['thread_id'],
-        'inquiry_checkin_date': thread['inquiry_checkin_date'],
-        'inquiry_checkout_date': thread['inquiry_checkout_date'],
-        'inquiry_number_of_guests': thread['inquiry_number_of_guests'],
-        'inquiry_price_native': thread['inquiry_price_native'],
-        'listing_id': listing['id'],
-        'price': listing['price'],
-        'guest_id': guest['id'],
-        'currency': reservation['native_currency'],
-        'instant_bookable': reservation['instant_bookable'],
-        'is_superhost': host_user['is_superhost'],
-        'identity_verified': guest['identity_verified'],
-        'guest_created_at': guest['created_at'],
-        'status': reservation['status'],
-        'pending_began_at': reservation['pending_began_at'],
-        'pending_expires_at': reservation['pending_expires_at']
-      }
-
-      ReservationRequest.update_or_create(self._db, params)
+      for reserve in reservations:
+        guest = reserve['guest_user']
+        Guest.update_or_create(self._db, guest)
+        earnings = reserve['earnings'].replace('€','')
+        self.__create_default_listing(reserve['listing_id'])
+        self.__create_default_thread(reserve['id'])
+        params = {
+          'confirmation_code':        reserve['confirmation_code'],
+          'thread_id':                reserve['thread_id'],
+          'start_date':               reserve['start_date'],
+          'end_date':                 reserve['end_date'],
+          'listing_id':               reserve['listing_id'],
+          'earnings':                 earnings,
+          'nights':                   reserve['nights'],
+          'booked_date':              reserve['booked_date'],
+          'host_vat_invoices':        json.dumps(reserve['host_vat_invoices']),
+          'guest_id':                 reserve['guest_user']['id']
+        }
+        Reservation.update_or_create(self._db, params)
+      offset += len(reservations)
+      if offset >= total_count:
+        break
 
 
   def hosting_activities(self):
-    """Sync HostingActivities"""
+    """Sync HostingActivities
+    """
 
     date_index = datetime.strptime(self._user['created_at'], self.DATETIME_FORMAT).date()
 
@@ -198,7 +213,9 @@ class Sync:
 
 
   def host_earnings(self):
-    """Sync HostEarnings"""
+    """Sync HostEarnings
+    """
+
     date_index = datetime.strptime(self._user['created_at'], self.DATETIME_FORMAT).date()
 
     while date_index < add_months(datetime.now(), 3):
@@ -220,3 +237,23 @@ class Sync:
 
       HostEarning.update_or_create(self._db, earning)
       date_index = add_months(date_index)
+
+
+  def __create_default_thread(self, id):
+    if not Thread.exists(self._db, {'id': id }):
+      Thread.create(self._db, {
+        'id': id,
+        'user_id': self._user['id'],
+        'status': 'removed',
+        'other_user_id': 0,
+        'unread': False
+      })
+
+  def __create_default_listing(self, id):
+    if not Listing.exists(self._db, {'id': id}):
+      Listing.create(self._db, {
+          'id': id,
+          'user_id': self._user['id'],
+          'name': 'Removed'
+        }
+      )

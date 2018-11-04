@@ -37,7 +37,6 @@ class Api(object):
       self._access_token = r.json()["login"]["id"]
       self.uid = r.json()["login"]["account"]["id"]
 
-      print("Your access token: {}".format(self._access_token))
       self._session.headers.update({"x-airbnb-oauth-token": self._access_token})
 
   def __headers(self, api_key, currency = "EUR", country = "us"):
@@ -78,11 +77,14 @@ class Api(object):
 
   def listing(self, listing_id):
     assert(self._access_token)
-    r = self._session.get(API_URL + "/listings/" + str(listing_id),
+    r = self._session.get(API_URL + "/listings",
       params = {
         'currency': str(self._currency),
+        'has_availability': str(False),
         'user_id': str(self.uid),
-        '_format': 'v1_legacy_for_p3'
+        '_offset': 0,
+        '_limit': 1,
+        'listing_ids[]': listing_id
       })
     r.raise_for_status()
     return r.json()
@@ -109,7 +111,7 @@ class Api(object):
     assert(self._access_token)
     r = self._session.get(API_URL + "/threads",
       params = {
-        'offset': offset,
+        '_offset': offset,
         'items_per_page': items_per_page,
         'currency': str(self._currency),
         '_format': 'for_web_inbox'
@@ -117,12 +119,16 @@ class Api(object):
     r.raise_for_status()
     return r.json()
 
-  def reservation_requests(self, thread_id):
+  def reservations(self, offset = 0, limit = 40):
     assert(self._access_token)
-    r = self._session.get(API_URL + "/reservations/relationship",
+    r = self._session.get(API_URL + "/reservations",
       params = {
-        'thread_id': thread_id,
-        'currency': str(self._currency)
+        '_offset': offset,
+        '_limit': limit,
+        'currency': str(self._currency),
+        '_format': 'for_reservations_list',
+        'collection_strategy': 'for_reservations_list',
+        'key': KEY
       })
     r.raise_for_status()
     return r.json()

@@ -14,7 +14,6 @@ steps = [
                 status                  varchar(64) NOT NULL,
                 unread                  boolean NOT NULL,
                 other_user_id           integer NOT NULL,
-                other_user_first_name   varchar(128) NOT NULL,
                 updated_at  timestamp without time zone default (now() at time zone 'utc'),
                 created_at  timestamp without time zone default (now() at time zone 'utc'),
 

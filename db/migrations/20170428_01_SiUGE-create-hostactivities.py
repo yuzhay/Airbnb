@@ -4,7 +4,7 @@ Create HostActivities
 
 from yoyo import step
 
-__depends__ = {'20170410_01_iCTAr-create-reservationrequests'}
+__depends__ = {'20170410_01_iCTAr-create-reservations'}
 
 steps = [
     step(
