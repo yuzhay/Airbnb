@@ -2,8 +2,15 @@ import json
 import time
 import pprint
 from datetime import date, datetime
+import phonenumbers
+from phonenumbers.phonenumberutil import (
+    region_code_for_country_code,
+    region_code_for_number,
+)
+import pycountry
 from models import *
 from airbnb import add_months
+
 
 class Sync:
   """Full synchronizer
@@ -13,11 +20,11 @@ class Sync:
   DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
   STEPS = [
     'users',
-    # 'listings',
-    # 'threads',
+    'listings',
+    'threads',
     'reservations',
-    # 'hosting_activities',
-    # 'host_earnings',
+    'hosting_activities',
+    'host_earnings',
   ]
 
   _db = None
@@ -158,10 +165,14 @@ class Sync:
 
       for reserve in reservations:
         guest = reserve['guest_user']
+        country = self.__get_country_by_phone(guest.get('phone'))
+        guest = { **guest, **country }
+
         Guest.update_or_create(self._db, guest)
+
         earnings = reserve['earnings'].replace('€','')
         self.__create_default_listing(reserve['listing_id'])
-        self.__create_default_thread(reserve['id'])
+        self.__create_default_thread(reserve['thread_id'])
         params = {
           'confirmation_code':        reserve['confirmation_code'],
           'thread_id':                reserve['thread_id'],
@@ -257,3 +268,14 @@ class Sync:
           'name': 'Removed'
         }
       )
+
+  def __get_country_by_phone(self, phone):
+    if phone == None:
+      return {}
+
+    pn = phonenumbers.parse(phone)
+    country = pycountry.countries.get(alpha_2=region_code_for_number(pn))
+    return {
+      'region_code': region_code_for_country_code(pn.country_code),
+      'country': country.name
+    }

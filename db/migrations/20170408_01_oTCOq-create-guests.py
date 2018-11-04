@@ -14,6 +14,8 @@ steps = [
             first_name varchar(128),
             full_name varchar(255),
             phone varchar(32),
+            region_code char(2),
+            country varchar(64),
             updated_at  timestamp without time zone default (now() at time zone 'utc'),
             created_at  timestamp without time zone default (now() at time zone 'utc')
         )""",
