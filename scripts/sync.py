@@ -1,7 +1,7 @@
 import json
 import time
 import pprint
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import phonenumbers
 from phonenumbers.phonenumberutil import (
     region_code_for_country_code,
@@ -41,6 +41,8 @@ class Sync:
     self._airbnb = airbnb
     self._timer = time.time()
     self._sync_listings = sync_listings
+    self._start_sync_date = None
+    self._force = False
 
 
   def console(self, msg):
@@ -54,9 +56,14 @@ class Sync:
     print(json.dumps(param, indent=2, sort_keys=True))
 
 
-  def run(self):
+  def run(self, force = False):
     """Run synchronization
     """
+
+    self._force = force
+
+    if not force:
+      self._start_sync_date = date.today() - timedelta(3)
 
     SyncLog.start(self._db)
     self.console("Syncing started")
@@ -94,7 +101,7 @@ class Sync:
       }
       Listing.update_or_create(self._db, params)
 
-      start_date = self._sync_listings[listing['id']]['start_date']
+      start_date = self.__max_date(self._sync_listings[listing['id']]['start_date'], self._start_sync_date)
 
       now = datetime.now().date()
       date_index = start_date
@@ -150,7 +157,7 @@ class Sync:
 
       offset += len(threads)
       page += 1
-      if page >= total_pages:
+      if page >= total_pages or not self._force:
         break
 
   def reservations(self):
@@ -158,8 +165,13 @@ class Sync:
     """
 
     offset = 0
+    if self._start_sync_date != None:
+      date_min = self._start_sync_date.strftime(self.DATE_FORMAT)
+    else:
+      date_min = None
+
     while True:
-      response = self._airbnb.reservations(offset)
+      response = self._airbnb.reservations(offset, 40, date_min)
       total_count = response['metadata']['total_count']
       reservations = response['reservations']
 
@@ -196,6 +208,7 @@ class Sync:
     """
 
     date_index = datetime.strptime(self._user['created_at'], self.DATETIME_FORMAT).date()
+    date_index = self.__max_date(date_index, self._start_sync_date)
 
     while date_index < add_months(datetime.now(), 3):
       params = {
@@ -228,6 +241,7 @@ class Sync:
     """
 
     date_index = datetime.strptime(self._user['created_at'], self.DATETIME_FORMAT).date()
+    date_index = self.__max_date(date_index, self._start_sync_date)
 
     while date_index < add_months(datetime.now(), 3):
       params = {
@@ -279,3 +293,15 @@ class Sync:
       'region_code': region_code_for_country_code(pn.country_code),
       'country': country.name
     }
+
+  def __max_date(self, date1, date2):
+    if date1 == None and date2 == None:
+      return None
+
+    if date1 == None:
+      return date2
+
+    if date2 == None:
+      return date1
+
+    return max(date1, date2)

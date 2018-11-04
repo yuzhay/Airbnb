@@ -36,12 +36,13 @@ if len(sys.argv) <= 1:
 command = sys.argv[1]
 if command == "sync":
   sync = Sync(DB, AIRBNB, CONFIG['airbnb']['listings'])
-  sync.run()
+
+  force = (len(sys.argv) > 2 and sys.argv[2] == '--force')
+  sync.run(force)
+
 elif command == 'migrate':
   os.system("yoyo apply --batch --database {0}".format(CONNECTION_STRING))
 elif command == "rollback":
   os.system("yoyo rollback --batch --database {0}".format(CONNECTION_STRING))
-elif command == "check":
-  pass
 else:
   print("Unknown command")

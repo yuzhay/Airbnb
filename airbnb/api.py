@@ -119,17 +119,22 @@ class Api(object):
     r.raise_for_status()
     return r.json()
 
-  def reservations(self, offset = 0, limit = 40):
+  def reservations(self, offset = 0, limit = 40, date_min = None):
     assert(self._access_token)
-    r = self._session.get(API_URL + "/reservations",
-      params = {
-        '_offset': offset,
-        '_limit': limit,
-        'currency': str(self._currency),
-        '_format': 'for_reservations_list',
-        'collection_strategy': 'for_reservations_list',
-        'key': KEY
-      })
+
+    params = {
+      '_offset': offset,
+      '_limit': limit,
+      'currency': str(self._currency),
+      '_format': 'for_reservations_list',
+      'collection_strategy': 'for_reservations_list',
+      'key': KEY
+    }
+
+    if date_min != None:
+      params['date_min'] = date_min
+
+    r = self._session.get(API_URL + "/reservations", params = params)
     r.raise_for_status()
     return r.json()
 
