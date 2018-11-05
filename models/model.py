@@ -43,6 +43,11 @@ class Model:
       cls.create(db, params)
 
   @classmethod
+  def get_where(cls, db, what, where):
+    query = "SELECT {0} FROM {1} WHERE {2};".format(what, cls.TABLE_NAME, where)
+    return db.execute(query)
+
+  @classmethod
   def get(cls, db, params):
     return cls.__select(db, params).fetchone()
 

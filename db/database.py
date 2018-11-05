@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.extras import NamedTupleCursor
 
 class Database(object):
   """Database driver"""
@@ -13,7 +14,7 @@ class Database(object):
     except psycopg2.OperationalError:
       print("Can't connect to the database")
 
-    self._cur = self._conn.cursor()
+    self._cur = self._conn.cursor(cursor_factory=NamedTupleCursor)
 
   def __del__(self):
     self._conn.close()

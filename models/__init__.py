@@ -8,3 +8,4 @@ from models.sync_log import SyncLog
 from models.thread import Thread
 from models.user import User
 from models.guest import Guest
+from models.occupancy import Occupancy

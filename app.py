@@ -11,7 +11,7 @@ from datetime import date
 import requests
 from airbnb import Api
 from db import Database
-from scripts import Sync
+from scripts import Sync, OccupancyCalculator
 import pprint
 
 # Load config
@@ -44,5 +44,8 @@ elif command == 'migrate':
   os.system("yoyo apply --batch --database {0}".format(CONNECTION_STRING))
 elif command == "rollback":
   os.system("yoyo rollback --batch --database {0}".format(CONNECTION_STRING))
+elif command == 'occupancy':
+  occupancy = OccupancyCalculator(DB)
+  occupancy.run()
 else:
   print("Unknown command")
