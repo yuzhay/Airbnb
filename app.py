@@ -22,7 +22,7 @@ with open("config/config.yml", "r") as config:
 AIRBNB = Api(CONFIG['airbnb']['user']['login'], CONFIG['airbnb']['user']['pass'])
 
 # Connect to database
-CONNECTION_STRING = "postgresql://{0}:{1}@localhost/{2} ./db/migrations".format(
+CONNECTION_STRING = "'postgresql://{0}:{1}@localhost/{2}' ./db/migrations".format(
     CONFIG['database']['user'],
     CONFIG['database']['password'],
     CONFIG['database']['name']
