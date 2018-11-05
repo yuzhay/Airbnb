@@ -183,6 +183,7 @@ class Sync:
         Guest.update_or_create(self._db, guest)
 
         earnings = reserve['earnings'].replace('€','')
+
         self.__create_default_listing(reserve['listing_id'])
         self.__create_default_thread(reserve['thread_id'])
         params = {
@@ -195,7 +196,8 @@ class Sync:
           'nights':                   reserve['nights'],
           'booked_date':              reserve['booked_date'],
           'host_vat_invoices':        json.dumps(reserve['host_vat_invoices']),
-          'guest_id':                 reserve['guest_user']['id']
+          'guest_id':                 reserve['guest_user']['id'],
+          'user_facing_status_key':   reserve['user_facing_status_key']
         }
         Reservation.update_or_create(self._db, params)
       offset += len(reservations)

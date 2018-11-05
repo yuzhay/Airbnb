@@ -19,6 +19,7 @@ steps = [
             host_vat_invoices           jsonb NOT NULL,
             guest_id                    integer NOT NULL,
             listing_id                  integer NOT NULL,
+            user_facing_status_key      varchar(32) NOT NULL,
             updated_at  timestamp without time zone default (now() at time zone 'utc'),
             created_at  timestamp without time zone default (now() at time zone 'utc'),
 
